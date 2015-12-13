@@ -164,3 +164,110 @@
  *   }]);
  * ```
  */
+ 
+ 
+
+function createInjector(modulesToLoad, strictDi) {
+  strictDi = (strictDi === true);
+  var INSTANTIATING = {},
+      providerSuffix = 'Provider',
+      path = [],
+      loadedModules = new HashMap([], true),
+      providerCache = {
+        $provide: {
+            provider: supportObject(provider),
+            factory: supportObject(factory),
+            service: supportObject(service),
+            value: supportObject(value),
+            constant: supportObject(constant),
+            decorator: decorator
+          }
+      },
+      providerInjector = (providerCache.$injector =
+          createInternalInjector(providerCache, function(serviceName, caller) {
+            if (angular.isString(caller)) {
+              path.push(caller);
+            }
+            throw $injectorMinErr('unpr', "Unknown provider: {0}", path.join(' <- '));
+          })),
+      instanceCache = {},
+      protoInstanceInjector =
+          createInternalInjector(instanceCache, function(serviceName, caller) {
+            var provider = providerInjector.get(serviceName + providerSuffix, caller);
+            return instanceInjector.invoke(
+                provider.$get, provider, undefined, serviceName);
+          }),
+      instanceInjector = protoInstanceInjector;
+
+  providerCache['$injector' + providerSuffix] = { $get: valueFn(protoInstanceInjector) };
+  var runBlocks = loadModules(modulesToLoad);
+  instanceInjector = protoInstanceInjector.get('$injector');
+  instanceInjector.strictDi = strictDi;
+  forEach(runBlocks, function(fn) { if (fn) instanceInjector.invoke(fn); });
+
+  return instanceInjector;
+
+  ////////////////////////////////////
+  // $provider
+  ////////////////////////////////////
+
+  function supportObject(delegate) {
+    return function(key, value) {
+      if (isObject(key)) {
+        forEach(key, reverseParams(delegate));
+      } else {
+        return delegate(key, value);
+      }
+    };
+  }
+
+  function provider(name, provider_) {
+    assertNotHasOwnProperty(name, 'service');
+    if (isFunction(provider_) || isArray(provider_)) {
+      provider_ = providerInjector.instantiate(provider_);
+    }
+    if (!provider_.$get) {
+      throw $injectorMinErr('pget', "Provider '{0}' must define $get factory method.", name);
+    }
+    return providerCache[name + providerSuffix] = provider_;
+  }
+
+  function enforceReturnValue(name, factory) {
+    return function enforcedReturnValue() {
+      var result = instanceInjector.invoke(factory, this);
+      if (isUndefined(result)) {
+        throw $injectorMinErr('undef', "Provider '{0}' must return a value from $get factory method.", name);
+      }
+      return result;
+    };
+  }
+
+  function factory(name, factoryFn, enforce) {
+    return provider(name, {
+      $get: enforce !== false ? enforceReturnValue(name, factoryFn) : factoryFn
+    });
+  }
+
+  function service(name, constructor) {
+    return factory(name, ['$injector', function($injector) {
+      return $injector.instantiate(constructor);
+    }]);
+  }
+
+  function value(name, val) { return factory(name, valueFn(val), false); }
+
+  function constant(name, value) {
+    assertNotHasOwnProperty(name, 'constant');
+    providerCache[name] = value;
+    instanceCache[name] = value;
+  }
+
+  function decorator(serviceName, decorFn) {
+    var origProvider = providerInjector.get(serviceName + providerSuffix),
+        orig$get = origProvider.$get;
+
+    origProvider.$get = function() {
+      var origInstance = instanceInjector.invoke(orig$get, origProvider);
+      return instanceInjector.invoke(decorFn, null, {$delegate: origInstance});
+    };
+  }
