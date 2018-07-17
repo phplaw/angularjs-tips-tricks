@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title of the document</title>
+    <style>
+        .ui-loading {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            left: 0;
+            top: 0;
+            z-index: 1000
+        }
+
+        .ui-loading div {
+            animation: loading 333ms alternate infinite cubic-bezier(0.2, 0, 0.5, 1);
+            -webkit-animation: loading 333ms alternate infinite cubic-bezier(0.2, 0, 0.5, 1);
+            -moz-animation: loading 333ms alternate infinite cubic-bezier(0.2, 0, 0.5, 1);
+            width: 50px;
+            height: 50px;
+            background-color: #8CC152;
+            background-color: #E9573F;
+            background-color: #DA4453;
+            background-color: #434A54;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            border-radius: 100px;
+            margin: -25px 0 0 -25px
+        }
+
+        @keyframes loading {
+            to {
+                transform: scale(0.4);
+                -webkit-transform: scale(0.4);
+                -moz-transform: scale(0.4);
+                -ms-transform: scale(0.4);
+                background-color: silver
+            }
+        }
+
+        @-webkit-keyframes loading {
+            to {
+                transform: scale(0.4);
+                -webkit-transform: scale(0.4);
+                -moz-transform: scale(0.4);
+                -ms-transform: scale(0.4);
+                background-color: silver
+            }
+        }
+
+        @-moz-keyframes loading {
+            to {
+                transform: scale(0.4);
+                -webkit-transform: scale(0.4);
+                -moz-transform: scale(0.4);
+                -ms-transform: scale(0.4);
+                background-color: silver
+            }
+        }
+
+        @-o-keyframes loading {
+            to {
+                transform: scale(0.4);
+                -webkit-transform: scale(0.4);
+                -moz-transform: scale(0.4);
+                -ms-transform: scale(0.4);
+                background-color: silver
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="ui-loading"><div></div></div>
+</body>
+
+</html>
