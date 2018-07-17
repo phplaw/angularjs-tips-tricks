@@ -1,12 +1,11 @@
 ```javascript
 (function() {
   angular
-    .module('jgefrohModule')
+    .module('myModule')
     .factory('PopupOnErrorInterceptor', [$q', '$injector', Interceptor])
     .config(['$httpProvider', Configuration]);
   function Interceptor($rootScope, $q, $injector) {
-    var UNPROCESSABLE = 422;
-    var SERVER_ERROR = 500;
+    var UNPROCESSABLE = 422, SERVER_ERROR = 500;
     return {
       responseError: function(response) {
         var popup = $injector.get('popup'); 
