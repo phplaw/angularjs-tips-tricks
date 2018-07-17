@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Code reuse with Script-Block - ng-include</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular.min.js"></script>
+</head>
+<body ng-app>
+
+  <script type="text/ng-template" id="my_template.tmpl">
+    <p>
+      I am Nr. {{ i }}!
+    </p>
+  </script>
+
+  <div ng-repeat="i in [1, 2, 3]">
+    <div ng-include="'my_template.tmpl'"></div>
+  </div>
+
+</body>
+</html>
