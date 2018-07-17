@@ -6,7 +6,7 @@ var $injector = angular.injector();
 var $http = $injector.get('$http'); //get $http service
 ```
 
-
+### Change scope outside
 ```html
 <script>
 var app = angular.module('app', []);
